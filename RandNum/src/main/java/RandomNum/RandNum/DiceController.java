@@ -1,5 +1,6 @@
 package RandomNum.RandNum;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,24 +31,17 @@ public class DiceController {
 		model.addAttribute("dice", DiceName);
 		
 		MakeDice DiceNames = new MakeDice();
-		
 		DiceNames.roll();
-
 		Connection conn = null;
-		{
-			 
+		{	 
 			try {
 				Properties prop = new Properties();
-				String propFileName = "application.properties";
 				
-				inputStream = getClass().getClassLoader().getResourceAsStream(propFileName);
-	 
+				inputStream = new FileInputStream("config/application.properties");
+				prop.load(inputStream);
 				if (inputStream != null) {
-					prop.load(inputStream);
-				} else {
-					throw new FileNotFoundException("property file '" + propFileName + "' not found in the classpath");
-				}
-	 
+					inputStream.close();
+				} 
 				// get the property value and print it out
 				String db = prop.getProperty("use.database");
 				String user = prop.getProperty("db.mysql.drivername");
@@ -56,9 +50,8 @@ public class DiceController {
 				String url = prop.getProperty("db.mysql.url");
 	 
 				result = db+username+pw+url;
-				
-				System.out.println(db+" DB "+ user+" Username " +username+" Password "+pw+ " " + url);
-			if(prop.getProperty("use.database").equals("true"))	{
+
+				if(prop.getProperty("use.database").equals("true"))	{
 			 String insert = "INSERT INTO random_number(dice1, dice2, dice3, timestamp) VALUES (?,?,?,?)";
 			 conn = (Connection) DriverManager.getConnection(url, username, pw);
 			 PreparedStatement ps = conn.prepareStatement(insert);
@@ -74,14 +67,11 @@ public class DiceController {
 			 
 			 System.out.println(ps);
 			}
-			
+				
 			} catch (Exception e) {
 				System.out.println("Exception: " + e);
-			} finally {
-				inputStream.close();
-		 return DiceNames;
-   }
-		
+			}
+			return DiceNames;
 	}
 		
 	}
